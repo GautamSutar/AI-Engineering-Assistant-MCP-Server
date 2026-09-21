@@ -1,0 +1,10 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+mcp==1.2.1
+langchain-mcp-adapters==0.0.9
+langgraph==0.2.62
+langchain-core==0.3.29
+langchain-groq==0.2.3
+sqlalchemy==2.0.36
+python-dotenv==1.0.1
+pydantic==2.10.4
