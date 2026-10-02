@@ -8,7 +8,7 @@ import os
 from mcp.server.fastmcp import FastMCP
 from starlette.middleware.cors import CORSMiddleware
 
-from app.mcp.tools import jobs
+from app.mcp.tools import github_ci, jobs
 
 mcp = FastMCP("ai-ops-assistant", host="0.0.0.0", port=int(os.getenv("PORT", 8001)))
 
@@ -35,6 +35,18 @@ def search_jobs(query: str, limit: int = 20) -> list[dict]:
 def get_job_stats() -> dict:
     """Get a quick count of jobs by status (total/failed/success/running)."""
     return jobs.get_job_stats()
+
+
+@mcp.tool()
+def get_recent_ci_failures(owner: str, repo: str, limit: int = 10) -> list[dict]:
+    """Get real recent failed GitHub Actions runs for a repo (e.g. owner=GautamSutar)."""
+    return github_ci.get_recent_ci_failures(owner, repo, limit=limit)
+
+
+@mcp.tool()
+def get_ci_failure_details(owner: str, repo: str, run_id: int) -> dict:
+    """Get which job(s) and step(s) failed for a specific GitHub Actions run id."""
+    return github_ci.get_ci_failure_details(owner, repo, run_id)
 
 
 if __name__ == "__main__":
