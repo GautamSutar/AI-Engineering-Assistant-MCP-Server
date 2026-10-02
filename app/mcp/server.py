@@ -6,6 +6,7 @@ Run directly: python -m app.mcp.server
 import os
 
 from mcp.server.fastmcp import FastMCP
+from starlette.middleware.cors import CORSMiddleware
 
 from app.mcp.tools import jobs
 
@@ -37,4 +38,14 @@ def get_job_stats() -> dict:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    import uvicorn
+
+    app = mcp.streamable_http_app()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+        allow_headers=["*"],
+        expose_headers=["Mcp-Session-Id"],
+    )
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8001)))
