@@ -3,11 +3,13 @@
 Run directly: python -m app.mcp.server
 """
 
+import os
+
 from mcp.server.fastmcp import FastMCP
 
 from app.mcp.tools import jobs
 
-mcp = FastMCP("ai-ops-assistant", host="0.0.0.0", port=8001)
+mcp = FastMCP("ai-ops-assistant", host="0.0.0.0", port=int(os.getenv("PORT", 8001)))
 
 
 @mcp.tool()
