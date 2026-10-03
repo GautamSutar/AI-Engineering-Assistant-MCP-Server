@@ -11,6 +11,10 @@ import httpx
 
 GITHUB_API = "https://api.github.com"
 
+MAX_LIMIT = 50
+
+def _clamp_limit(limit: int) -> int:
+    return max(1, min(limit, MAX_LIMIT))
 
 def _headers() -> dict:
     token = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
@@ -29,6 +33,7 @@ def _headers() -> dict:
 
 def get_recent_ci_failures(owner: str, repo: str, limit: int = 10) -> list[dict]:
     """Get the most recent failed GitHub Actions workflow runs for owner/repo."""
+    limit = _clamp_limit(limit)
     resp = httpx.get(
         f"{GITHUB_API}/repos/{owner}/{repo}/actions/runs",
         headers=_headers(),
