@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Seed database
+        run: python -m app.db.seed
+
+      - name: Compile check
+        run: python -m compileall app main.py
+
+      - name: Import check
+        run: |
+          python -c "import app.mcp.server"
+          python -c "import app.agent.graph"
+          python -c "import app.api.routes"

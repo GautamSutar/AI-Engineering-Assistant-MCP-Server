@@ -5,9 +5,19 @@ from sqlalchemy import or_
 from app.db.database import SessionLocal
 from app.db.models import Job
 
+MAX_LIMIT = 100
+MAX_HOURS = 24 * 30
+
+def _clamp_limit(limit: int) -> int:
+    return max(1, min(limit, MAX_LIMIT))
+
+def _clamp_hours(hours: int) -> int:
+    return max(1, min(hours, MAX_HOURS))
 
 def get_failed_jobs(hours: int = 24, limit: int = 20) -> list[dict]:
     """Return failed jobs from the last `hours` hours, most recent first."""
+    hours = _clamp_hours(hours)
+    limit = _clamp_limit(limit)
     session = SessionLocal()
     try:
         since = datetime.utcnow() - timedelta(hours=hours)
@@ -35,6 +45,7 @@ def get_job_by_id(job_id: int) -> dict | None:
 
 def search_jobs(query: str, limit: int = 20) -> list[dict]:
     """Search jobs by name, service, or error message substring (case-insensitive)."""
+    limit = _clamp_limit(limit)
     session = SessionLocal()
     try:
         like = f"%{query}%"
@@ -67,3 +78,4 @@ def get_job_stats() -> dict:
         return stats
     finally:
         session.close()
+        

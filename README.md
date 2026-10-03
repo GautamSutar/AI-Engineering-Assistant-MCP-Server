@@ -57,10 +57,29 @@ curl -X POST http://localhost:8000/chat \
 The agent will call `get_failed_jobs` (and possibly `get_job_by_id` /
 `search_jobs`) via MCP, then summarize the real failures from SQLite.
 
+## Real data: GitHub Actions CI failures
+
+`get_failed_jobs` etc. only ever see seeded, fake data. For real data, two more
+tools (`app/mcp/tools/github_ci.py`) query the live GitHub Actions API for any
+repo you have access to:
+
+- `get_recent_ci_failures(owner, repo, limit=10)` -- real failed workflow runs
+- `get_ci_failure_details(owner, repo, run_id)` -- which job/step failed
+
+Requires a GitHub fine-grained PAT with **Actions: read** permission, set as
+`GITHUB_PERSONAL_ACCESS_TOKEN` in `.env`. This repo's own `.github/workflows/ci.yml`
+gives you something real to query immediately:
+
+```bash
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d "{\"message\": \"Are there any recent failed CI runs on GautamSutar/AI-Engineering-Assistant-MCP-Server?\"}"
+```
+
 ## Roadmap
 
 - [ ] Tool permission tiers (read / write / dangerous) with human-in-the-loop approval
-- [ ] Docker / monitoring / GitHub MCP tool servers
+- [ ] Docker / monitoring tool servers
 - [ ] Auth (API key or JWT) on the FastAPI layer
 - [ ] Streaming responses
 - [ ] Docker Compose for MCP server + API + Postgres
