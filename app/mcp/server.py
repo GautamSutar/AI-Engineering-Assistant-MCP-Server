@@ -44,6 +44,12 @@ def get_recent_ci_failures(owner: str, repo: str, limit: int = 10) -> list[dict]
 
 
 @mcp.tool()
+def list_ci_workflows(owner: str, repo: str, limit: int = 20) -> list[dict]:
+    """List the GitHub Actions workflows defined in a repo, with their state (active/disabled)."""
+    return github_ci.list_workflows(owner, repo, limit=limit)
+
+
+@mcp.tool()
 def get_ci_failure_details(owner: str, repo: str, run_id: int) -> dict:
     """Get which job(s) and step(s) failed for a specific GitHub Actions run id."""
     return github_ci.get_ci_failure_details(owner, repo, run_id)

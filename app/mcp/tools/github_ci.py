@@ -56,6 +56,29 @@ def get_recent_ci_failures(owner: str, repo: str, limit: int = 10) -> list[dict]
     ]
 
 
+def list_workflows(owner: str, repo: str, limit: int = 20) -> list[dict]:
+    """List the GitHub Actions workflows defined in owner/repo, with their state."""
+    limit = _clamp_limit(limit)
+    resp = httpx.get(
+        f"{GITHUB_API}/repos/{owner}/{repo}/actions/workflows",
+        headers=_headers(),
+        params={"per_page": limit},
+        timeout=20,
+    )
+    resp.raise_for_status()
+    workflows = resp.json().get("workflows", [])
+    return [
+        {
+            "workflow_id": wf["id"],
+            "name": wf["name"],
+            "path": wf["path"],
+            "state": wf["state"],
+            "html_url": wf["html_url"],
+        }
+        for wf in workflows
+    ]
+
+
 def get_ci_failure_details(owner: str, repo: str, run_id: int) -> dict:
     """Get which job(s) and step(s) failed for a specific GitHub Actions run."""
     resp = httpx.get(
